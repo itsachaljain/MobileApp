@@ -28,6 +28,7 @@ import {
 	fetchLeaders,
 	fetchPromos,
 } from "../redux/ActionCreators";
+import Reservation from "./ReservationComponent";
 
 const mapStateToProps = (state) => {
 	return {
@@ -49,6 +50,7 @@ const HomeNavigator = createStackNavigator();
 const AboutNavigator = createStackNavigator();
 const MenuNavigator = createStackNavigator();
 const ContactNavigator = createStackNavigator();
+const ReservationNavigator = createStackNavigator();
 
 const MainNavigator = createDrawerNavigator();
 
@@ -142,6 +144,23 @@ function MainNavigatorDrawer() {
 								name="address-card"
 								type="font-awesome"
 								size={22}
+								color={tintColor}
+							/>
+						),
+					})
+				}
+			/>
+			<MainNavigator.Screen
+				name="Reservation"
+				component={ReservationNavigatorScreen}
+				options={
+					({ title: "Reserve Table" },
+					{
+						drawerIcon: ({ tintColor }) => (
+							<Icon
+								name="cutlery"
+								type="font-awesome"
+								size={24}
 								color={tintColor}
 							/>
 						),
@@ -290,6 +309,40 @@ function ContactNavigatorScreen() {
 				})}
 			/>
 		</ContactNavigator.Navigator>
+	);
+}
+
+function ReservationNavigatorScreen() {
+	return (
+		<ReservationNavigator.Navigator
+			initialRouteName="Reservation"
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: "#512DA8",
+				},
+				headerTintColor: "#fff",
+				headerTitleStyle: {
+					color: "#fff",
+				},
+			}}
+		>
+			<ReservationNavigator.Screen
+				name="Reservation Table"
+				component={Reservation}
+				options={({ navigation }) => ({
+					headerLeft: () => (
+						<Icon
+							name="menu"
+							size={30}
+							color="white"
+							onPress={() => {
+								navigation.toggleDrawer();
+							}}
+						/>
+					),
+				})}
+			/>
+		</ReservationNavigator.Navigator>
 	);
 }
 
