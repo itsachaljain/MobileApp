@@ -4,6 +4,7 @@ import Menu from "./MenuComponent";
 import About from "./AboutComponent";
 import Contact from "./ContactComponent";
 import Dishdetail from "./DishdetailComponent";
+import Favorites from "./FavoriteComponent";
 import {
 	View,
 	Platform,
@@ -51,6 +52,7 @@ const AboutNavigator = createStackNavigator();
 const MenuNavigator = createStackNavigator();
 const ContactNavigator = createStackNavigator();
 const ReservationNavigator = createStackNavigator();
+const FavoritesNavigator = createStackNavigator();
 
 const MainNavigator = createDrawerNavigator();
 
@@ -99,6 +101,7 @@ function MainNavigatorDrawer() {
 					})
 				}
 			/>
+
 			<MainNavigator.Screen
 				name="About"
 				component={AboutNavigatorScreen}
@@ -116,6 +119,7 @@ function MainNavigatorDrawer() {
 					})
 				}
 			/>
+
 			<MainNavigator.Screen
 				name="Menu"
 				component={MenuNavigatorScreen}
@@ -133,6 +137,7 @@ function MainNavigatorDrawer() {
 					})
 				}
 			/>
+
 			<MainNavigator.Screen
 				name="Contact"
 				component={ContactNavigatorScreen}
@@ -150,6 +155,25 @@ function MainNavigatorDrawer() {
 					})
 				}
 			/>
+
+			<MainNavigator.Screen
+				name="My Favorites"
+				component={FavoritesNavigatorScreen}
+				options={
+					({ title: "My Favorites" },
+					{
+						drawerIcon: ({ tintColor }) => (
+							<Icon
+								name="heart"
+								type="font-awesome"
+								size={24}
+								color={tintColor}
+							/>
+						),
+					})
+				}
+			/>
+
 			<MainNavigator.Screen
 				name="Reservation"
 				component={ReservationNavigatorScreen}
@@ -343,6 +367,40 @@ function ReservationNavigatorScreen() {
 				})}
 			/>
 		</ReservationNavigator.Navigator>
+	);
+}
+
+function FavoritesNavigatorScreen() {
+	return (
+		<FavoritesNavigator.Navigator
+			initialRouteName="Favorites"
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: "#512DA8",
+				},
+				headerTintColor: "#fff",
+				headerTitleStyle: {
+					color: "#fff",
+				},
+			}}
+		>
+			<FavoritesNavigator.Screen
+				name="My Favorites"
+				component={Favorites}
+				options={({ navigation }) => ({
+					headerLeft: () => (
+						<Icon
+							name="menu"
+							size={30}
+							color="white"
+							onPress={() => {
+								navigation.toggleDrawer();
+							}}
+						/>
+					),
+				})}
+			/>
+		</FavoritesNavigator.Navigator>
 	);
 }
 
