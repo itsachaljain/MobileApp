@@ -472,7 +472,7 @@ class Main extends Component {
 			<View
 				style={{
 					flex: 1,
-					paddingTop: Platform.OS === "android" ? 0 : StatusBar.currentHeight,
+					paddingTop: Platform.OS === "ios" ? 0 : StatusBar.currentHeight,
 				}}
 			>
 				<NavigationContainer>

@@ -5,12 +5,17 @@ import {
 	StyleSheet,
 	Switch,
 	Button,
-	Modal,
 	Alert,
+	TouchableOpacity,
 } from "react-native";
+import { Icon } from "react-native-elements";
 import { Picker } from "@react-native-community/picker";
-import DatePicker from "react-native-datepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import Moment from "moment";
 import * as Animatable from "react-native-animatable";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
+import { ScrollView } from "react-native-gesture-handler";
 
 class Reservation extends Component {
 	constructor(props) {
@@ -18,7 +23,9 @@ class Reservation extends Component {
 		this.state = {
 			guests: 1,
 			smoking: false,
-			date: "",
+			date: new Date(),
+			show: false,
+			mode: "date",
 		};
 	}
 
@@ -26,7 +33,9 @@ class Reservation extends Component {
 		this.setState({
 			guests: 1,
 			smoking: false,
-			date: "",
+			date: new Date(),
+			show: false,
+			mode: "date",
 		});
 	}
 
@@ -47,16 +56,50 @@ class Reservation extends Component {
 				},
 				{
 					text: "OK",
-					onPress: () => this.resetForm(),
+					onPress: () => {
+						this.presentLocalNotification(this.state.date);
+						this.resetForm();
+					},
 				},
 			],
 			{ cancelable: false }
 		);
 	}
 
+	async obtainNotificationPermission() {
+		let permission = await Permissions.getAsync(
+			Permissions.USER_FACING_NOTIFICATIONS
+		);
+		if (permission.status !== "granted") {
+			permission = await Permissions.askAsync(
+				Permissions.USER_FACING_NOTIFICATIONS
+			);
+			if (permission.status !== "granted") {
+				Alert.alert("Permission not granted to show notifications");
+			}
+		}
+		return permission;
+	}
+
+	async presentLocalNotification(date) {
+		await this.obtainNotificationPermission();
+		Notifications.presentLocalNotificationAsync({
+			title: "Your Reservation",
+			body: "Reservation for " + date + " requested",
+			ios: {
+				sound: true,
+			},
+			android: {
+				sound: true,
+				vibrate: true,
+				color: "#512DA8",
+			},
+		});
+	}
+
 	render() {
 		return (
-			<Animatable.View animation="zoomIn" duration={2000}>
+			<ScrollView>
 				<View style={styles.formRow}>
 					<Text style={styles.formLabel}>Number of Guests</Text>
 					<Picker
@@ -85,30 +128,41 @@ class Reservation extends Component {
 				</View>
 				<View style={styles.formRow}>
 					<Text style={styles.formLabel}>Date and Time</Text>
-					<DatePicker
-						style={{ flex: 2, marginRight: 20 }}
-						date={this.state.date}
-						format=""
-						mode="datetime"
-						placeholder="Select Date and Time"
-						minDate="2017-01-01"
-						confirmBtnText="Confirm"
-						cancelBtnText="Cancel"
-						customStyles={{
-							dateIcon: {
-								position: "absolute",
-								left: 0,
-								top: 4,
-								marginLeft: 0,
-							},
-							dateInput: {
-								marginLeft: 36,
-							},
+					<TouchableOpacity
+						style={styles.formItem}
+						style={{
+							padding: 7,
+							borderColor: "#512DA8",
+							borderWidth: 2,
+							flexDirection: "row",
 						}}
-						onDateChange={(date) => {
-							this.setState({ date: date });
-						}}
-					/>
+						onPress={() => this.setState({ show: true, mode: "date" })}
+					>
+						<Icon type="font-awesome" name="calendar" color="#512DA8" />
+						<Text>
+							{" " + Moment(this.state.date).format("DD-MMM-YYYY h:mm A")}
+						</Text>
+					</TouchableOpacity>
+					{/* Date Time Picker */}
+					{this.state.show && (
+						<DateTimePicker
+							value={this.state.date}
+							mode={this.state.mode}
+							minimumDate={new Date()}
+							minuteInterval={30}
+							onChange={(event, date) => {
+								if (date === undefined) {
+									this.setState({ show: false });
+								} else {
+									this.setState({
+										show: this.state.mode === "time" ? false : true,
+										mode: "time",
+										date: new Date(date),
+									});
+								}
+							}}
+						/>
+					)}
 				</View>
 				<View style={styles.formRow}>
 					<Button
@@ -118,7 +172,7 @@ class Reservation extends Component {
 						accessibilityLabel="Learn more about this purple button"
 					/>
 				</View>
-			</Animatable.View>
+			</ScrollView>
 		);
 	}
 }
