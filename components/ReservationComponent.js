@@ -12,7 +12,6 @@ import { Icon } from "react-native-elements";
 import { Picker } from "@react-native-community/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Moment from "moment";
-import * as Animatable from "react-native-animatable";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import { ScrollView } from "react-native-gesture-handler";
@@ -140,10 +139,9 @@ class Reservation extends Component {
 					>
 						<Icon type="font-awesome" name="calendar" color="#512DA8" />
 						<Text>
-							{" " + Moment(this.state.date).format("DD-MMM-YYYY h:mm A")}
+							{" " + Moment(this.state.date).format("DD-MM-YYYY, hh:mm A")}
 						</Text>
 					</TouchableOpacity>
-					{/* Date Time Picker */}
 					{this.state.show && (
 						<DateTimePicker
 							value={this.state.date}
