@@ -5,6 +5,7 @@ import About from "./AboutComponent";
 import Contact from "./ContactComponent";
 import Dishdetail from "./DishdetailComponent";
 import Favorites from "./FavoriteComponent";
+import Login from "./LoginComponent";
 import {
 	View,
 	Platform,
@@ -53,6 +54,7 @@ const MenuNavigator = createStackNavigator();
 const ContactNavigator = createStackNavigator();
 const ReservationNavigator = createStackNavigator();
 const FavoritesNavigator = createStackNavigator();
+const LoginNavigator = createStackNavigator();
 
 const MainNavigator = createDrawerNavigator();
 
@@ -81,9 +83,28 @@ const CustomDrawerContentComponent = (props) => (
 function MainNavigatorDrawer() {
 	return (
 		<MainNavigator.Navigator
+			initialRouteName="Home"
 			drawerStyle={{ backgroundColor: "#D1C4E9" }}
 			drawerContent={(props) => <CustomDrawerContentComponent {...props} />}
 		>
+			<MainNavigator.Screen
+				name="Login"
+				component={LoginNavigatorScreen}
+				options={
+					({ title: "Login" },
+					{
+						drawerIcon: ({ tintColor }) => (
+							<Icon
+								name="sign-in"
+								type="font-awesome"
+								size={24}
+								color={tintColor}
+							/>
+						),
+					})
+				}
+			/>
+
 			<MainNavigator.Screen
 				name="Home"
 				component={HomeNavigatorScreen}
@@ -401,6 +422,40 @@ function FavoritesNavigatorScreen() {
 				})}
 			/>
 		</FavoritesNavigator.Navigator>
+	);
+}
+
+function LoginNavigatorScreen() {
+	return (
+		<LoginNavigator.Navigator
+			initialRouteName="Login"
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: "#512DA8",
+				},
+				headerTintColor: "#fff",
+				headerTitleStyle: {
+					color: "#fff",
+				},
+			}}
+		>
+			<LoginNavigator.Screen
+				name="Login"
+				component={Login}
+				options={({ navigation }) => ({
+					headerLeft: () => (
+						<Icon
+							name="menu"
+							size={30}
+							color="white"
+							onPress={() => {
+								navigation.toggleDrawer();
+							}}
+						/>
+					),
+				})}
+			/>
+		</LoginNavigator.Navigator>
 	);
 }
 
