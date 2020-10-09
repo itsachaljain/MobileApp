@@ -1,18 +1,20 @@
 import React, { Component } from "react";
 import {
-	Text,
 	View,
+	Text,
 	StyleSheet,
 	Switch,
 	Button,
 	Alert,
 	TouchableOpacity,
+	Platform,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { Picker } from "@react-native-community/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Moment from "moment";
 import { Notifications } from "expo";
+import * as Calendar from "expo-calendar";
 import * as Permissions from "expo-permissions";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -57,6 +59,7 @@ class Reservation extends Component {
 					text: "OK",
 					onPress: () => {
 						this.presentLocalNotification(this.state.date);
+						this.handleReservationToCalendar(this.state.date);
 						this.resetForm();
 					},
 				},
@@ -64,6 +67,58 @@ class Reservation extends Component {
 			{ cancelable: false }
 		);
 	}
+
+	obtainCalendarPermission = async () => {
+		let permission = await Permissions.getAsync(Permissions.CALENDAR);
+		if (permission.status !== "granted") {
+			permission = await Permissions.askAsync(Permissions.CALENDAR);
+			if (permission.status !== "granted") {
+				Alert.alert("Permission not granted to access Calendar");
+			}
+		}
+		return permission;
+	};
+
+	getDefaultCalendarSource = async () => {
+		const calendars = await Calendar.getCalendarsAsync();
+		const defaultCalendars = calendars.filter(
+			(each) => each.source.name === "Default"
+		);
+		return defaultCalendars[0].source;
+	};
+
+	handleReservationToCalendar = async (date) => {
+		await this.obtainCalenderPermission();
+
+		const defaultCalendarSource =
+			Platform.OS === "ios"
+				? await getDefaultCalendarSource()
+				: { isLocalAccount: true, name: "Expo Calendar" };
+
+		const tempDate = Date.parse(date);
+		const startDate = new Date(tempDate);
+		const endDate = new Date(tempDate + 2 * 60 * 60 * 1000);
+
+		const calendarID = await Calendar.createCalendarAsync({
+			title: "Expo Calendar",
+			color: "blue",
+			entityType: Calendar.EntityTypes.EVENT,
+			sourceId: defaultCalendarSource.id,
+			source: defaultCalendarSource,
+			name: "internalCalendarName",
+			ownerAccount: "personal",
+			accessLevel: Calendar.CalendarAccessLevel.OWNER,
+		});
+
+		await Calendar.createEventAsync(calendarID, {
+			title: "Con Fusion Table Reservation",
+			startDate: startDate,
+			endDate: endDate,
+			timeZone: "Asia/Hong_Kong",
+			location:
+				"121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong",
+		});
+	};
 
 	async obtainNotificationPermission() {
 		let permission = await Permissions.getAsync(
